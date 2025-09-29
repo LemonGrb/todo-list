@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dark Mode Todo List</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    :root {
+      --bg: #181b20;
+      --surface: #23272f;
+      --accent: #5e81ac;
+      --accent-hover: #81a1c1;
+      --danger: #bf616a;
+      --text: #eceff4;
+      --muted: #a0a9ba;
+      --border: #2e3440;
+      --radius: 10px;
+      --transition: 0.18s cubic-bezier(.4,0,.2,1);
+      font-size: 18px;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 420px;
+      margin: 60px auto 0 auto;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px #0005;
+      padding: 32px 24px 24px 24px;
+      min-height: 480px;
+    }
+    h1 {
+      text-align: center;
+      color: var(--accent);
+      margin-bottom: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 26px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: box-shadow var(--transition);
+      box-shadow: 0 2px 6px #0002;
+    }
+    input[type="text"]:focus {
+      box-shadow: 0 2px 8px var(--accent-hover);
+    }
+    button, .btn {
+      background: var(--accent);
+      color: var(--text);
+      border: none;
+      border-radius: var(--radius);
+      padding: 10px 16px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background var(--transition);
+      font-weight: 500;
+    }
+    button:hover, .btn:hover {
+      background: var(--accent-hover);
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .todo-item {
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      padding: 10px 14px;
+      box-shadow: 0 1px 4px #0003;
+      transition: box-shadow var(--transition), background var(--transition);
+    }
+    .todo-item.completed {
+      opacity: 0.62;
+      text-decoration: line-through;
+      background: #23272f55;
+    }
+    .todo-item input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      accent-color: var(--accent);
+      margin-right: 18px;
+    }
+    .todo-text {
+      flex: 1;
+      font-size: 1rem;
+      word-break: break-word;
+    }
+    .actions {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .btn-edit, .btn-delete, .btn-save, .btn-cancel {
+      font-size: 0.96rem;
+      padding: 6px 10px;
+      border-radius: var(--radius);
+      margin-left: 2px;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color var(--transition), background var(--transition);
+    }
+    .btn-edit:hover, .btn-save:hover {
+      color: var(--accent-hover);
+      background: #2e344055;
+    }
+    .btn-delete:hover, .btn-cancel:hover {
+      color: var(--danger);
+      background: #2e344055;
+    }
+    @media (max-width: 540px) {
+      .container {
+        margin: 0;
+        min-height: 100vh;
+        border-radius: 0;
+        padding: 20px 8px 24px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🗒️ Todo List</h1>
+    <form id="todo-form" autocomplete="off">
+      <input type="text" id="todo-input" placeholder="What needs to be done?" maxlength="90" required>
+      <button type="submit">Add</button>
+    </form>
+    <ul id="todo-list"></ul>
+  </div>
+  <script>
+    // --- LocalStorage helpers ---
+    const LS_KEY = 'darkmode-todos';
+    function getTodos() {
+      return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+    }
+    function setTodos(todos) {
+      localStorage.setItem(LS_KEY, JSON.stringify(todos));
+    }
+
+    // --- Main App ---
+    let todos = getTodos();
+
+    function renderTodos() {
+      const ul = document.getElementById('todo-list');
+      ul.innerHTML = '';
+      todos.forEach((todo, idx) => {
+        const li = document.createElement('li');
+        li.className = 'todo-item' + (todo.completed ? ' completed' : '');
+        // Checkbox
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!todo.completed;
+        cb.addEventListener('change', () => toggleComplete(idx));
+        li.appendChild(cb);
+        // Task Text or Edit Field
+        if (todo.editing) {
+          const editInput = document.createElement('input');
+          editInput.type = 'text';
+          editInput.value = todo.text;
+          editInput.maxLength = 90;
+          editInput.className = 'todo-text';
+          editInput.style.marginRight = '10px';
+          editInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') saveEdit(idx, editInput.value);
+            if (e.key === 'Escape') cancelEdit(idx);
+          });
+          li.appendChild(editInput);
+          editInput.focus();
+
+          // Save/Cancel
+          const actions = document.createElement('div');
+          actions.className = 'actions';
+          const saveBtn = document.createElement('button');
+          saveBtn.className = 'btn-save';
+          saveBtn.textContent = 'Save';
+          saveBtn.onclick = () => saveEdit(idx, editInput.value);
+          const cancelBtn = document.createElement('button');
+          cancelBtn.className = 'btn-cancel';
+          cancelBtn.textContent = 'Cancel';
+          cancelBtn.onclick = () => cancelEdit(idx);
+          actions.appendChild(saveBtn);
+          actions.appendChild(cancelBtn);
+          li.appendChild(actions);
+
+        } else {
+          const span = document.createElement('span');
+          span.className = 'todo-text';
+          span.textContent = todo.text;
+          li.appendChild(span);
+
+          // Edit/Delete
+          const actions = document.createElement('div');
+          actions.className = 'actions';
+          const editBtn = document.createElement('button');
+          editBtn.className = 'btn-edit';
+          editBtn.title = 'Edit';
+          editBtn.textContent = '✏️';
+          editBtn.onclick = () => startEdit(idx);
+
+          const delBtn = document.createElement('button');
+          delBtn.className = 'btn-delete';
+          delBtn.title = 'Delete';
+          delBtn.textContent = '🗑️';
+          delBtn.onclick = () => deleteTodo(idx);
+
+          actions.appendChild(editBtn);
+          actions.appendChild(delBtn);
+          li.appendChild(actions);
+        }
+        ul.appendChild(li);
+      });
+    }
+
+    // --- Event Handlers ---
+    document.getElementById('todo-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const input = document.getElementById('todo-input');
+      const text = input.value.trim();
+      if (text) {
+        todos.unshift({ text, completed: false, editing: false });
+        setTodos(todos);
+        input.value = '';
+        renderTodos();
+      }
+    });
+
+    function toggleComplete(idx) {
+      todos[idx].completed = !todos[idx].completed;
+      setTodos(todos);
+      renderTodos();
+    }
+    function startEdit(idx) {
+      todos = todos.map((todo, i) => ({ ...todo, editing: i === idx }));
+      renderTodos();
+    }
+    function saveEdit(idx, newText) {
+      const text = newText.trim();
+      if (text) {
+        todos[idx].text = text;
+        todos[idx].editing = false;
+        setTodos(todos);
+        renderTodos();
+      }
+    }
+    function cancelEdit(idx) {
+      todos[idx].editing = false;
+      renderTodos();
+    }
+    function deleteTodo(idx) {
+      if (confirm('Delete this task?')) {
+        todos.splice(idx, 1);
+        setTodos(todos);
+        renderTodos();
+      }
+    }
+
+    // --- Initial Render ---
+    renderTodos();
+  </script>
+</body>
+</html>
