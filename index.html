@@ -4,77 +4,126 @@
   <meta charset="UTF-8">
   <title>Dark Mode Todo List</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!-- Modern, fun font from Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #181b20;
-      --surface: #23272f;
-      --accent: #5e81ac;
-      --accent-hover: #81a1c1;
-      --danger: #bf616a;
-      --text: #eceff4;
-      --muted: #a0a9ba;
-      --border: #2e3440;
-      --radius: 10px;
+      --bg: #181a26;
+      --surface: #23243a;
+      --accent: #6c63ff;
+      --accent2: #8f6fff;
+      --accent3: #2ec7ff;
+      --danger: #ee4b6a;
+      --text: #f6f7fb;
+      --muted: #b5b3c5;
+      --border: #2d2e36;
+      --radius: 14px;
       --transition: 0.18s cubic-bezier(.4,0,.2,1);
-      font-size: 18px;
+      --fast: 0.10s cubic-bezier(.4,0,.2,1);
     }
     html, body {
       margin: 0;
       padding: 0;
-      background: var(--bg);
+      background: linear-gradient(135deg, #191a2b 0%, #23243a 100%);
       color: var(--text);
-      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
       min-height: 100vh;
+      background-attachment: fixed;
     }
     .container {
-      max-width: 420px;
+      max-width: 460px;
       margin: 60px auto 0 auto;
       background: var(--surface);
       border-radius: var(--radius);
-      box-shadow: 0 4px 24px #0005;
-      padding: 32px 24px 24px 24px;
-      min-height: 480px;
+      box-shadow: 0 4px 36px 4px #6c63ff44, 0 1.5px 16px 2px #2ec7ff44;
+      padding: 36px 26px 32px 26px;
+      min-height: 560px;
+      position: relative;
+      border: 2px solid transparent;
+      background-clip: padding-box;
     }
     h1 {
       text-align: center;
-      color: var(--accent);
-      margin-bottom: 24px;
       font-weight: 700;
       letter-spacing: -0.5px;
+      background: linear-gradient(90deg, #6c63ff, #8f6fff 60%, #2ec7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 24px;
+      font-size: 2.15rem;
+    }
+    .progress-bar-label {
+      display: block;
+      color: var(--muted);
+      font-size: 1.01rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 7px;
+      user-select: none;
+      letter-spacing: 0.03em;
+      text-shadow: 0 2px 8px #23243a;
+    }
+    .progress-bar-container {
+      background: #191a2b;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+      height: 22px;
+      width: 100%;
+      box-shadow: 0 2px 12px #0003;
+      position: relative;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2) 65%, var(--accent3) 100%);
+      box-shadow: 0 0 10px 2px #6c63ff88;
+      width: 0%;
+      border-radius: var(--radius);
+      transition: width var(--transition);
+      filter: brightness(1.15) drop-shadow(0 0 10px #2ec7ff55);
     }
     form {
       display: flex;
-      gap: 8px;
-      margin-bottom: 26px;
+      gap: 10px;
+      margin-bottom: 28px;
     }
     input[type="text"] {
       flex: 1;
-      padding: 10px 14px;
+      padding: 12px 16px;
       border: none;
       border-radius: var(--radius);
-      background: var(--bg);
+      background: linear-gradient(90deg, #191a2b 80%, #23243a 120%);
       color: var(--text);
       font-size: 1rem;
       outline: none;
-      transition: box-shadow var(--transition);
-      box-shadow: 0 2px 6px #0002;
+      font-family: inherit;
+      transition: box-shadow var(--transition), background var(--transition);
+      box-shadow: 0 2px 8px #6c63ff22;
     }
     input[type="text"]:focus {
-      box-shadow: 0 2px 8px var(--accent-hover);
+      background: linear-gradient(90deg, #23243a 60%, #2ec7ff22 100%);
+      box-shadow: 0 2px 12px var(--accent2);
     }
     button, .btn {
-      background: var(--accent);
-      color: var(--text);
+      background: linear-gradient(90deg, var(--accent), var(--accent2) 80%, var(--accent3));
+      color: #fff;
       border: none;
       border-radius: var(--radius);
-      padding: 10px 16px;
-      font-size: 1rem;
+      padding: 10px 22px;
+      font-size: 1.09rem;
+      font-family: inherit;
       cursor: pointer;
-      transition: background var(--transition);
-      font-weight: 500;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      transition: background var(--transition), box-shadow var(--transition), filter var(--fast);
+      box-shadow: 0 2px 8px #6c63ff33;
+      filter: brightness(1.06);
     }
-    button:hover, .btn:hover {
-      background: var(--accent-hover);
+    button:hover, .btn:hover, button:focus, .btn:focus {
+      filter: brightness(1.18) drop-shadow(0 0 10px #2ec7ff88);
+      background: linear-gradient(90deg, var(--accent2), var(--accent3) 80%, var(--accent));
     }
     ul {
       list-style: none;
@@ -83,76 +132,204 @@
     }
     .todo-item {
       display: flex;
-      align-items: center;
-      background: var(--bg);
+      align-items: flex-start;
+      background: linear-gradient(90deg, #22244b 90%, #23243a 100%);
       border-radius: var(--radius);
-      margin-bottom: 10px;
-      padding: 10px 14px;
-      box-shadow: 0 1px 4px #0003;
-      transition: box-shadow var(--transition), background var(--transition);
+      margin-bottom: 13px;
+      padding: 12px 16px 12px 16px;
+      box-shadow: 0 1.5px 10px #6c63ff22, 0 1.5px 12px #2ec7ff22;
+      transition: box-shadow var(--transition), background var(--transition), opacity var(--fast), max-height var(--transition), margin-bottom var(--fast), border var(--fast);
+      position: relative;
+      opacity: 1;
+      max-height: 300px;
+      overflow: hidden;
+      border-left: 4px solid transparent;
+      cursor: grab;
+      user-select: none;
     }
     .todo-item.completed {
       opacity: 0.62;
       text-decoration: line-through;
-      background: #23272f55;
+      background: linear-gradient(90deg, #23243a 80%, #22244b 100%);
+      border-left: 4px solid var(--accent2);
+    }
+    .todo-item.deleting {
+      opacity: 0;
+      max-height: 0;
+      margin-bottom: 0;
+    }
+    .todo-item.adding {
+      animation: fadeIn 0.22s;
+    }
+    .todo-item.dragging {
+      opacity: 0.45;
+      background: #23243a55;
+      border: 2.5px dashed var(--accent3);
+    }
+    .todo-item.drag-over {
+      box-shadow: 0 0 0 4px var(--accent3), 0 2px 14px #2ec7ff44;
+      background: linear-gradient(90deg, #2ec7ff66 0%, #8f6fff33 100%);
     }
     .todo-item input[type="checkbox"] {
-      width: 22px;
-      height: 22px;
-      accent-color: var(--accent);
+      width: 26px;
+      height: 26px;
+      accent-color: var(--accent2);
       margin-right: 18px;
+      margin-top: 4px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 7px #2ec7ff88);
+      cursor: pointer;
     }
     .todo-text {
       flex: 1;
-      font-size: 1rem;
+      font-size: 1.07rem;
       word-break: break-word;
+      margin-right: 10px;
+      margin-top: 2px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      cursor: grab;
+    }
+    .todo-description {
+      display: block;
+      font-size: 0.97rem;
+      color: var(--muted);
+      margin-top: 4px;
+      margin-bottom: 2px;
+      padding-left: 2px;
+      white-space: pre-line;
+      word-break: break-word;
+      font-weight: 400;
+      cursor: grab;
     }
     .actions {
       display: flex;
-      gap: 5px;
+      gap: 6px;
       align-items: center;
+      margin-left: 4px;
+      margin-top: 1px;
     }
     .btn-edit, .btn-delete, .btn-save, .btn-cancel {
-      font-size: 0.96rem;
-      padding: 6px 10px;
+      font-size: 1.02rem;
+      padding: 7px 11px;
       border-radius: var(--radius);
       margin-left: 2px;
-      background: none;
+      background: linear-gradient(90deg, var(--accent2) 40%, var(--accent3) 100%);
       border: none;
-      color: var(--muted);
+      color: #fff;
       cursor: pointer;
-      transition: color var(--transition), background var(--transition);
+      font-family: inherit;
+      font-weight: 600;
+      transition: color var(--transition), background var(--transition), filter var(--fast);
+      box-shadow: 0 1.5px 5px #6c63ff33;
+      filter: brightness(1.05);
+      cursor: pointer;
     }
     .btn-edit:hover, .btn-save:hover {
-      color: var(--accent-hover);
-      background: #2e344055;
+      filter: brightness(1.15) drop-shadow(0 0 7px #2ec7ffcc);
+      background: linear-gradient(90deg, var(--accent3), var(--accent2) 100%);
+    }
+    .btn-delete, .btn-cancel {
+      background: linear-gradient(90deg, var(--danger) 60%, var(--accent2) 100%);
+      color: #fff;
+      filter: brightness(1.06);
     }
     .btn-delete:hover, .btn-cancel:hover {
-      color: var(--danger);
-      background: #2e344055;
+      filter: brightness(1.22) drop-shadow(0 0 7px #ee4b6acc);
+      background: linear-gradient(90deg, var(--accent2), var(--danger) 100%);
+    }
+    .description-input {
+      width: 95%;
+      padding: 9px;
+      border-radius: var(--radius);
+      border: none;
+      background: linear-gradient(90deg, #252a34 80%, #23243a 100%);
+      color: var(--text);
+      font-size: 1rem;
+      margin-top: 4px;
+      margin-bottom: 2px;
+      resize: vertical;
+      min-height: 30px;
+      max-height: 120px;
+      box-shadow: 0 1.5px 7px #2ec7ff33;
+      outline: none;
+      font-family: inherit;
+      transition: box-shadow var(--transition), background var(--transition);
+    }
+    .description-input:focus {
+      background: linear-gradient(90deg, #23243a 60%, #2ec7ff33 100%);
+      box-shadow: 0 2px 14px var(--accent2);
+    }
+    .quote-box {
+      background: linear-gradient(90deg, var(--accent), var(--accent2) 60%, var(--accent3) 100%);
+      border-left: 5px solid var(--accent2);
+      border-radius: var(--radius);
+      padding: 17px 20px;
+      margin-top: 38px;
+      text-align: center;
+      color: #fff;
+      font-size: 1.14rem;
+      font-style: italic;
+      font-weight: 600;
+      box-shadow: 0 2px 14px #6c63ff33, 0 2px 12px #2ec7ff33;
+      transition: opacity var(--transition);
+      opacity: 1;
+      min-height: 44px;
+      user-select: none;
+      text-shadow: 0 2px 8px #8f6fff55;
+      letter-spacing: 0.03em;
+      filter: brightness(1.09);
+    }
+    .quote-box.hidden {
+      opacity: 0;
+      pointer-events: none;
+      height: 0;
+      min-height: 0;
+      padding: 0;
+      margin: 0;
     }
     @media (max-width: 540px) {
       .container {
         margin: 0;
         min-height: 100vh;
         border-radius: 0;
-        padding: 20px 8px 24px 8px;
+        padding: 16px 2px 16px 2px;
       }
+      .quote-box { font-size: 1.01rem; padding: 10px 6px;}
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>🗒️ Todo List</h1>
+    <span class="progress-bar-label" id="progress-label"></span>
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
     <form id="todo-form" autocomplete="off">
       <input type="text" id="todo-input" placeholder="What needs to be done?" maxlength="90" required>
       <button type="submit">Add</button>
     </form>
     <ul id="todo-list"></ul>
+    <div class="quote-box hidden" id="quote-box"></div>
   </div>
   <script>
+    // --- Motivational Quotes ---
+    const quotes = [
+      "You did it! All tasks complete. Time to celebrate! 🥳",
+      "Every accomplishment starts with the decision to try.",
+      "Great job! Remember to take a break and enjoy your success.",
+      "Nothing is impossible. The word itself says 'I’m possible'!",
+      "All tasks done. You rock! 🚀",
+      "Small steps every day lead to big results.",
+      "Productivity is never an accident. Well done!",
+      "You have conquered your list. Enjoy your free time!",
+      "Celebrate your wins, no matter how small.",
+      "Done and dusted. Keep up the awesome work!"
+    ];
+
     // --- LocalStorage helpers ---
-    const LS_KEY = 'darkmode-todos';
+    const LS_KEY = 'darkmode-todos-v2';
     function getTodos() {
       return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
     }
@@ -160,23 +337,112 @@
       localStorage.setItem(LS_KEY, JSON.stringify(todos));
     }
 
-    // --- Main App ---
+    // --- State ---
     let todos = getTodos();
 
-    function renderTodos() {
+    // --- Progress Indicator ---
+    function renderProgress() {
+      const bar = document.getElementById('progress-bar');
+      const label = document.getElementById('progress-label');
+      const total = todos.length;
+      const completed = todos.filter(t=>t.completed).length;
+      let percent = total ? Math.round(100*completed/total) : 0;
+      bar.style.width = percent + '%';
+      label.textContent = total ? `${completed} of ${total} complete (${percent}%)` : "No tasks";
+    }
+
+    // --- Motivational Quote ---
+    function renderQuote() {
+      const box = document.getElementById('quote-box');
+      if (todos.length > 0 && todos.every(t=>t.completed)) {
+        // all done
+        box.textContent = quotes[Math.floor(Math.random()*quotes.length)];
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+        box.textContent = '';
+      }
+    }
+
+    // --- Animated Remove ---
+    function removeWithAnimation(li, idx) {
+      li.classList.add('deleting');
+      setTimeout(() => {
+        todos.splice(idx, 1);
+        setTodos(todos);
+        renderTodos(true);
+      }, 180);
+    }
+
+    // --- Drag and Drop ---
+    let dragSrcIdx = null;
+
+    function handleDragStart(e, idx) {
+      dragSrcIdx = idx;
+      e.currentTarget.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e, idx) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const ul = document.getElementById('todo-list');
+      Array.from(ul.children).forEach((li, i) => {
+        if (i === idx) li.classList.add('drag-over');
+        else li.classList.remove('drag-over');
+      });
+    }
+
+    function handleDragLeave(e, idx) {
+      e.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDrop(e, idx) {
+      e.preventDefault();
+      if (dragSrcIdx === null || dragSrcIdx === idx) return;
+      // Move the dragged todo to the drop position
+      const moved = todos.splice(dragSrcIdx, 1)[0];
+      todos.splice(idx, 0, moved);
+      setTodos(todos);
+      dragSrcIdx = null;
+      renderTodos(true);
+    }
+
+    function handleDragEnd(e) {
+      dragSrcIdx = null;
+      const ul = document.getElementById('todo-list');
+      Array.from(ul.children).forEach(li => {
+        li.classList.remove('drag-over');
+        li.classList.remove('dragging');
+      });
+    }
+
+    // --- Main App ---
+    function renderTodos(skipAddAnim) {
       const ul = document.getElementById('todo-list');
       ul.innerHTML = '';
       todos.forEach((todo, idx) => {
         const li = document.createElement('li');
         li.className = 'todo-item' + (todo.completed ? ' completed' : '');
+        if (!skipAddAnim && idx === 0 && !todo.editing) li.classList.add('adding');
+        li.setAttribute('draggable', !todo.editing); // prevent dragging while editing
+        // Drag events
+        li.addEventListener('dragstart', e => handleDragStart(e, idx));
+        li.addEventListener('dragover', e => handleDragOver(e, idx));
+        li.addEventListener('dragleave', e => handleDragLeave(e, idx));
+        li.addEventListener('drop', e => handleDrop(e, idx));
+        li.addEventListener('dragend', handleDragEnd);
+
         // Checkbox
         const cb = document.createElement('input');
         cb.type = 'checkbox';
         cb.checked = !!todo.completed;
         cb.addEventListener('change', () => toggleComplete(idx));
         li.appendChild(cb);
+
         // Task Text or Edit Field
         if (todo.editing) {
+          // --- Editing Mode ---
           const editInput = document.createElement('input');
           editInput.type = 'text';
           editInput.value = todo.text;
@@ -184,11 +450,25 @@
           editInput.className = 'todo-text';
           editInput.style.marginRight = '10px';
           editInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') saveEdit(idx, editInput.value);
+            if (e.key === 'Enter') saveEdit(idx, editInput.value, descInput.value);
             if (e.key === 'Escape') cancelEdit(idx);
           });
           li.appendChild(editInput);
-          editInput.focus();
+
+          // --- Description field ---
+          const descInput = document.createElement('textarea');
+          descInput.className = 'description-input';
+          descInput.placeholder = "Optional notes or description...";
+          descInput.value = todo.desc || "";
+          descInput.rows = 2;
+          descInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              saveEdit(idx, editInput.value, descInput.value);
+            }
+            if (e.key === 'Escape') cancelEdit(idx);
+          });
+          li.appendChild(descInput);
 
           // Save/Cancel
           const actions = document.createElement('div');
@@ -196,20 +476,31 @@
           const saveBtn = document.createElement('button');
           saveBtn.className = 'btn-save';
           saveBtn.textContent = 'Save';
-          saveBtn.onclick = () => saveEdit(idx, editInput.value);
+          saveBtn.onclick = (e) => { e.preventDefault(); saveEdit(idx, editInput.value, descInput.value);}
           const cancelBtn = document.createElement('button');
           cancelBtn.className = 'btn-cancel';
           cancelBtn.textContent = 'Cancel';
-          cancelBtn.onclick = () => cancelEdit(idx);
+          cancelBtn.onclick = (e) => { e.preventDefault(); cancelEdit(idx);}
           actions.appendChild(saveBtn);
           actions.appendChild(cancelBtn);
           li.appendChild(actions);
 
+          // Focus main input by default
+          setTimeout(()=>editInput.focus(), 70);
+
         } else {
+          // --- Display Mode ---
           const span = document.createElement('span');
           span.className = 'todo-text';
           span.textContent = todo.text;
           li.appendChild(span);
+
+          if (todo.desc) {
+            const desc = document.createElement('span');
+            desc.className = 'todo-description';
+            desc.textContent = todo.desc;
+            li.appendChild(desc);
+          }
 
           // Edit/Delete
           const actions = document.createElement('div');
@@ -224,7 +515,7 @@
           delBtn.className = 'btn-delete';
           delBtn.title = 'Delete';
           delBtn.textContent = '🗑️';
-          delBtn.onclick = () => deleteTodo(idx);
+          delBtn.onclick = () => removeWithAnimation(li, idx);
 
           actions.appendChild(editBtn);
           actions.appendChild(delBtn);
@@ -232,6 +523,8 @@
         }
         ul.appendChild(li);
       });
+      renderProgress();
+      renderQuote();
     }
 
     // --- Event Handlers ---
@@ -240,7 +533,7 @@
       const input = document.getElementById('todo-input');
       const text = input.value.trim();
       if (text) {
-        todos.unshift({ text, completed: false, editing: false });
+        todos.unshift({ text, completed: false, editing: false, desc: "" });
         setTodos(todos);
         input.value = '';
         renderTodos();
@@ -250,31 +543,25 @@
     function toggleComplete(idx) {
       todos[idx].completed = !todos[idx].completed;
       setTodos(todos);
-      renderTodos();
+      renderTodos(true);
     }
     function startEdit(idx) {
       todos = todos.map((todo, i) => ({ ...todo, editing: i === idx }));
-      renderTodos();
+      renderTodos(true);
     }
-    function saveEdit(idx, newText) {
+    function saveEdit(idx, newText, newDesc) {
       const text = newText.trim();
       if (text) {
         todos[idx].text = text;
+        todos[idx].desc = (newDesc || "").trim();
         todos[idx].editing = false;
         setTodos(todos);
-        renderTodos();
+        renderTodos(true);
       }
     }
     function cancelEdit(idx) {
       todos[idx].editing = false;
-      renderTodos();
-    }
-    function deleteTodo(idx) {
-      if (confirm('Delete this task?')) {
-        todos.splice(idx, 1);
-        setTodos(todos);
-        renderTodos();
-      }
+      renderTodos(true);
     }
 
     // --- Initial Render ---
